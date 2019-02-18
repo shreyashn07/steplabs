@@ -1,12 +1,14 @@
 package com.steplabs.backend.vidtalk.controllers;
 
 
+import com.steplabs.backend.vidtalk.RestResponse;
 import com.steplabs.backend.vidtalk.exception.ResourceNotFoundException;
 import com.steplabs.backend.vidtalk.model.Comment;
 import com.steplabs.backend.vidtalk.model.UserProfile;
 import com.steplabs.backend.vidtalk.repository.CommentRepository;
 import com.steplabs.backend.vidtalk.repository.PostRepository;
 import com.steplabs.backend.vidtalk.repository.UserProfileRepository;
+import com.steplabs.backend.vidtalk.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,9 @@ import java.util.Optional;
 
 @RestController
 public class CommentController {
+
+    @Autowired
+    private CommentService commentService;
 
     @Autowired
     private CommentRepository commentRepository;
@@ -35,42 +40,51 @@ public class CommentController {
     }
 
     @PostMapping("/posts/{postId}/{userProfileId}/comments")
-    public Comment createComment(@PathVariable (value = "postId") Long postId,
-                                 @Valid @RequestBody Comment comment,@PathVariable(value="userProfileId") Long userProfileId) {
+    public RestResponse<?> createComment(@PathVariable (value = "postId") Long postId,
+                                      @Valid @RequestBody Comment comment, @PathVariable(value="userProfileId") Long userProfileId) {
 
         Optional<UserProfile> userProfile=userProfileRepository.findById(userProfileId);
         comment.setUserProfile(userProfile.get());
-        return postRepository.findById(postId).map(post -> {
-            comment.setPost(post);
-            return commentRepository.save(comment);
-        }).orElseThrow(() -> new ResourceNotFoundException("PostId " + postId + " not found"));
+        try {
+            return RestResponse.createSuccessResponse(commentService.saveComment(postId, comment));
+        }
+        catch(ResourceNotFoundException e)
+        {
+            return RestResponse.createFailureResponse(e.getMessage(),400);
+        }
+
     }
 
     @PutMapping("/posts/{postId}/comments/{commentId}")
-    public Comment updateComment(@PathVariable (value = "postId") Long postId,
+    public RestResponse<?> updateComment(@PathVariable (value = "postId") Long postId,
                                  @PathVariable (value = "commentId") Long commentId,
                                  @Valid @RequestBody Comment commentRequest) {
         if(!postRepository.existsById(postId)) {
             throw new ResourceNotFoundException("PostId " + postId + " not found");
         }
+      try{
+          return RestResponse.createSuccessResponse(commentService.editComment(commentId,commentRequest));
+      }
+      catch(ResourceNotFoundException e)
+        {
+            return RestResponse.createFailureResponse(e.getMessage(),400);
+        }
 
-        return commentRepository.findById(commentId).map(comment -> {
-            comment.setText(commentRequest.getText());
-            return commentRepository.save(comment);
-        }).orElseThrow(() -> new ResourceNotFoundException("CommentId " + commentId + "not found"));
     }
 
     @DeleteMapping("/posts/{postId}/comments/{commentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable (value = "postId") Long postId,
+    public RestResponse<?> deleteComment(@PathVariable (value = "postId") Long postId,
                                            @PathVariable (value = "commentId") Long commentId) {
         if(!postRepository.existsById(postId)) {
             throw new ResourceNotFoundException("PostId " + postId + " not found");
         }
 
-        return commentRepository.findById(commentId).map(comment -> {
-            commentRepository.delete(comment);
-            return ResponseEntity.ok().build();
-        }).orElseThrow(() -> new ResourceNotFoundException("CommentId " + commentId + " not found"));
+        try{
+            return RestResponse.createSuccessResponse(commentService.deleteComment(commentId));
+        }
+        catch(ResourceNotFoundException e){
+            return RestResponse.createFailureResponse(e.getMessage(),400);
+        }
     }
 }
 

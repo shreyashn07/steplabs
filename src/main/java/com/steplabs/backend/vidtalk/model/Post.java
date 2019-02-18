@@ -14,9 +14,22 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- * Created by rajeevkumarsingh on 21/11/17.
- */
+
+@SqlResultSetMapping(
+        name = "findAllDataMapping",
+        classes = @ConstructorResult(
+                targetClass = com.steplabs.backend.vidtalk.dto.PostDto.class,
+                columns = {
+                        @ColumnResult(name = "id",type=Long.class),
+                        @ColumnResult(name = "title",type= String.class),
+                        @ColumnResult(name = "description",type=String.class),
+                        @ColumnResult(name = "content",type=String.class),
+                        @ColumnResult(name = "userId",type=Long.class),
+                        @ColumnResult(name = "profile_Pic_Url",type=String.class)
+                }
+        )
+)
+
 @Data
 @EqualsAndHashCode
 @Entity

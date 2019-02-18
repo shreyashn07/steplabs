@@ -2,10 +2,12 @@ package com.steplabs.backend.vidtalk.controllers;
 
 
 import com.steplabs.backend.vidtalk.RestResponse;
+import com.steplabs.backend.vidtalk.dto.PostDto;
 import com.steplabs.backend.vidtalk.model.Post;
 import com.steplabs.backend.vidtalk.model.User;
 import com.steplabs.backend.vidtalk.repository.PostRepository;
 import com.steplabs.backend.vidtalk.repository.UserRepository;
+import com.steplabs.backend.vidtalk.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -26,11 +28,14 @@ public class UserController {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private UserService userService;
+
 
     @PostMapping("/user")
-    public User createUser(@Valid @RequestBody User user){
-        user.getUserProfile().setUser(user);
-        return userRepository.save(user);
+    public RestResponse createUser(@Valid @RequestBody User user){
+        return  RestResponse.createSuccessResponse(userService.insertUser(user));
+
     }
 
     @GetMapping("/user")
@@ -46,14 +51,15 @@ public class UserController {
 
         }
         return RestResponse.createSuccessResponse(userInfo);
+
     }
 
 
     @GetMapping("/user/getall")
-    public List<Post> getAllPosts(@Valid @RequestParam("userProfId") Long userProfId){
+    public List<PostDto> getAllPosts(@Valid @RequestParam("userProfId") Long userProfId){
         List<Post> posts= new ArrayList<>();
 
-        return postRepository.findByUserProfid(userProfId);
+        return postRepository.findByUserProfileId(userProfId);
 
 
 
