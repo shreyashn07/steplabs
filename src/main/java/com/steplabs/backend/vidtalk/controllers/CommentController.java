@@ -21,8 +21,7 @@ import java.util.Optional;
 @RestController
 public class CommentController {
 
-    @Autowired
-    private CommentService commentService;
+
 
     @Autowired
     private CommentRepository commentRepository;
@@ -32,6 +31,9 @@ public class CommentController {
 
     @Autowired
     private UserProfileRepository userProfileRepository;
+
+    @Autowired
+    private CommentService commentService;
 
     @GetMapping("/posts/{postId}/comments")
     public Page<Comment> getAllCommentsByPostId(@PathVariable (value = "postId") Long postId,

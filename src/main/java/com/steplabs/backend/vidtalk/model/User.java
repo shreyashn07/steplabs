@@ -11,6 +11,7 @@ import javax.persistence.*;
 import javax.sound.sampled.spi.AudioFileReader;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Data
@@ -29,6 +30,9 @@ public class User extends AuditModel {
     @NotNull
     @Size(max=200)
     private String fcmId;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    List<Role> roles;
 
     @OneToOne(fetch = FetchType.LAZY,
             cascade =  CascadeType.ALL,

@@ -32,21 +32,28 @@ public class UserController {
     private UserService userService;
 
 
-    @PostMapping("/user")
+    @PostMapping("/users/signup")
     public RestResponse createUser(@Valid @RequestBody User user){
+        boolean flag=true;
+      //  flag=userService.alreadyRegistered(user.getEmail());
+        if(flag)
+        {
         return  RestResponse.createSuccessResponse(userService.insertUser(user));
+        }
+       return RestResponse.createFailureResponse("User Already exists",200);
 
-    }
+        }
 
-    @GetMapping("/user")
+    @GetMapping("/users/signin")
     public RestResponse getUser(@Valid @RequestParam("email") String user){
 
-        Optional<User> userInfo =Optional.empty();
+        User userInfo;// =Optional.empty();
         List<User> list= new ArrayList();
         userInfo=userRepository.findByEmail(user);
         if(userInfo!= null)
         {
             //userInfo=userRepository.getUserByEmail(user);
+
             return RestResponse.createSuccessResponse(userInfo);
 
         }
