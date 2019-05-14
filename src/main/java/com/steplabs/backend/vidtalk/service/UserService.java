@@ -7,7 +7,7 @@ import java.util.Optional;
 public interface UserService {
 
     String insertUser(User user);
-    User getUserInfo(String user);
+    String fetchUserToken(String user);
     boolean alreadyRegistered(String email);
 
 }

@@ -32,8 +32,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/users/signin").permitAll()//
                 .antMatchers("/users/signup").permitAll()//
                 .antMatchers("/h2-console/**/**").permitAll()
+                .antMatchers("**").permitAll()
+                .antMatchers("/v2/api-docs").permitAll()
+                .antMatchers("/swagger-ui.html").permitAll()
                 // Disallow everything else..
-                .anyRequest().authenticated();
+                .anyRequest().permitAll();
 
         // If a user try to access a resource without having enough permissions
         http.exceptionHandling().accessDeniedHandler(new RestAccessDeniedHandler()).authenticationEntryPoint(new RestAuthenticationEntryPoint());
@@ -45,21 +48,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // http.httpBasic();
     }
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        // Allow swagger to be accessed without authentication
-        web.ignoring().antMatchers("/v2/api-docs")//
-                .antMatchers("/swagger-resources/**")//
-                .antMatchers("/swagger-ui.html")//
-                .antMatchers("/configuration/**")//
-                .antMatchers("/webjars/**")//
-                .antMatchers("/public")
-
-                // Un-secure H2 Database (for testing purposes, H2 console shouldn't be unprotected in production)
-                .and()
-                .ignoring()
-                .antMatchers("/h2-console/**/**");;
-    }
+//    @Override
+//    public void configure(WebSecurity web) throws Exception {
+//        // Allow swagger to be accessed without authentication
+//        web.ignoring().antMatchers("/v2/api-docs")//
+//                .antMatchers("/swagger-resources/**")//
+//                .antMatchers("/swagger-ui.html")//
+//                .antMatchers("/configuration/**")//
+//                .antMatchers("/webjars/**")//
+//                .antMatchers("/public")
+//
+//                // Un-secure H2 Database (for testing purposes, H2 console shouldn't be unprotected in production)
+//                .and()
+//                .ignoring()
+//                .antMatchers("/h2-console/**/**");;
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
